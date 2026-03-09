@@ -18,6 +18,7 @@ const SCREENS = {
   BUDDY: 'buddy',
   LESSON: 'lesson',
   RESULTS: 'results',
+  WORDSEARCH: 'wordsearch',
 };
 
 function awardXp({ correct, streakAfter }) {
@@ -89,6 +90,11 @@ export default function useAppState() {
 
   function goBuddyCare() {
     setScreen(SCREENS.BUDDY);
+    setBuddyAction('idle');
+  }
+
+  function goWordSearch() {
+    setScreen(SCREENS.WORDSEARCH);
     setBuddyAction('idle');
   }
 
@@ -224,6 +230,44 @@ export default function useAppState() {
     resetQuestionState();
   }
 
+  function completeWordSearch({ rewardXp = 0 } = {}) {
+    let nextProfile = { ...profile };
+
+    nextProfile.pet = nextProfile.pet || { ...DEFAULT_PROFILE.pet };
+    nextProfile.food = nextProfile.food || { ...DEFAULT_PROFILE.food };
+
+    const beforeLevel = nextProfile.level;
+    nextProfile = applyXp(nextProfile, rewardXp);
+    const afterLevel = nextProfile.level;
+    const levelsGained = Math.max(0, afterLevel - beforeLevel);
+
+    nextProfile.pet.hunger = clamp01to100(nextProfile.pet.hunger - 3);
+    nextProfile.pet.happiness = clamp01to100(nextProfile.pet.happiness + 6);
+
+    if (levelsGained > 0) {
+      const rewards = makeLevelUpRewards(levelsGained);
+      nextProfile.food = addFood(nextProfile.food, rewards);
+      nextProfile.lastRewards = {
+        levelsGained,
+        rewards,
+        dateISO: new Date().toISOString(),
+      };
+    }
+
+    nextProfile.lastSession = {
+      accuracy: 100,
+      correct: 1,
+      total: 1,
+      xpEarned: rewardXp,
+      mode: 'Word Search',
+      dateISO: new Date().toISOString(),
+    };
+
+    setProfile(nextProfile);
+    saveProfile(nextProfile);
+    setBuddyActionTemporarily('correct');
+  }
+
   function feedBuddy() {
     if (!hasAnyFood(profile.food)) return;
 
@@ -275,10 +319,12 @@ export default function useAppState() {
       setLessonMode,
       goHome,
       goBuddyCare,
+      goWordSearch,
       resetProfile,
       startLesson,
       answer,
       continueAfterAnswer,
+      completeWordSearch,
       feedBuddy,
     },
   };

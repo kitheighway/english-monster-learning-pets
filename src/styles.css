@@ -1551,3 +1551,338 @@ body {
   display: block;
   background: transparent !important;
 }
+
+/* =========================
+   WORD SEARCH GAME
+========================= */
+
+.ws-game {
+  min-height: 100vh;
+  padding: 20px;
+  background:
+    radial-gradient(circle at top left, #fff9c9 0%, rgba(255, 249, 201, 0.35) 22%, transparent 40%),
+    radial-gradient(circle at top right, #dff7ff 0%, rgba(223, 247, 255, 0.4) 22%, transparent 40%),
+    linear-gradient(180deg, #fffef6 0%, #f8fbff 100%);
+}
+
+.ws-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.ws-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.ws-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ws-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.ws-pill--lime {
+  background: #dff7d8;
+  color: #247a1d;
+  border: 2px solid #b7ebb0;
+}
+
+.ws-pill--gold {
+  background: #fff0b8;
+  color: #8b5a00;
+  border: 2px solid #ffd66c;
+}
+
+.ws-title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 0.95;
+}
+
+.ws-subtitle {
+  margin: 8px 0 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #536174;
+}
+
+.ws-progressBlock {
+  margin-top: 16px;
+  max-width: 360px;
+}
+
+.ws-progressMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 800;
+  color: #223046;
+}
+
+.ws-progressBar {
+  height: 16px;
+  background: #e8eef6;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.8);
+}
+
+.ws-progressBar__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #58cc02 0%, #84e33b 100%);
+  transition: width 180ms ease;
+}
+
+.ws-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.ws-boardCard,
+.ws-card {
+  background: #ffffff;
+  border-radius: 28px;
+  border: 3px solid #e2e9f3;
+  box-shadow: 0 10px 0 #dbe5f0;
+}
+
+.ws-boardCard {
+  padding: 18px;
+}
+
+.ws-card {
+  padding: 18px;
+}
+
+.ws-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ws-helper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: linear-gradient(180deg, #f6fbff 0%, #eef7ff 100%);
+  border: 2px solid #d9e8fb;
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.ws-helper__emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.ws-helper p {
+  margin: 0;
+  font-weight: 800;
+  color: #334155;
+}
+
+.ws-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.ws-cell {
+  aspect-ratio: 1 / 1;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fc 100%);
+  box-shadow:
+    0 5px 0 #dfe7f0,
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+  font: inherit;
+  font-weight: 900;
+  font-size: clamp(1rem, 1.7vw, 1.3rem);
+  color: #1e293b;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
+}
+
+.ws-cell:hover {
+  transform: translateY(-1px);
+}
+
+.ws-cell:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 0 #dfe7f0,
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.ws-cell.is-selected {
+  background: linear-gradient(180deg, #dff1ff 0%, #cde8ff 100%);
+  box-shadow:
+    0 5px 0 #b6d7f5,
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+  color: #0f4f84;
+}
+
+.ws-cell.is-found {
+  background: linear-gradient(180deg, #ddf9d2 0%, #c4efaf 100%);
+  box-shadow:
+    0 5px 0 #a2db89,
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+  color: #1f5f19;
+}
+
+.ws-actions,
+.ws-successActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ws-btn {
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 18px;
+  border: 0;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.ws-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ws-btn--primary {
+  color: #fff;
+  background: linear-gradient(180deg, #66d61f 0%, #58cc02 100%);
+  box-shadow: 0 6px 0 #43a000;
+}
+
+.ws-btn--soft {
+  color: #1753a2;
+  background: linear-gradient(180deg, #ebf4ff 0%, #d8eaff 100%);
+  box-shadow: 0 6px 0 #bdd6f8;
+}
+
+.ws-btn--ghost {
+  color: #344054;
+  background: #fff;
+  border: 2px solid #dbe2ea;
+  box-shadow: 0 6px 0 #e7edf4;
+}
+
+.ws-card__title {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.ws-wordList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ws-wordList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf2f7;
+  font-weight: 900;
+  color: #213047;
+}
+
+.ws-wordList li:last-child {
+  border-bottom: 0;
+}
+
+.ws-wordList li.is-done {
+  color: #2b7a1d;
+}
+
+.ws-wordList__icon {
+  font-size: 1rem;
+}
+
+.ws-card--tip {
+  background: linear-gradient(180deg, #fffef4 0%, #fff9db 100%);
+  border-color: #f7e8a0;
+  box-shadow: 0 10px 0 #efdf92;
+}
+
+.ws-card--success {
+  background: linear-gradient(180deg, #effee7 0%, #dbf8cb 100%);
+  border-color: #b8ec9a;
+  box-shadow: 0 10px 0 #a8de8b;
+}
+
+.ws-successBurst {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 960px) {
+  .ws-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ws-hero {
+    flex-direction: column;
+  }
+
+  .ws-hero__right {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .ws-game {
+    padding: 14px;
+  }
+
+  .ws-boardCard,
+  .ws-card {
+    border-radius: 22px;
+    padding: 14px;
+  }
+
+  .ws-grid {
+    gap: 6px;
+  }
+
+  .ws-cell {
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  .ws-btn {
+    width: 100%;
+  }
+}

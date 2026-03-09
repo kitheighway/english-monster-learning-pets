@@ -14,6 +14,7 @@ export default function HomeScreen({
   onStartLesson,
   onSetLessonMode,
   onGoBuddyCare,
+  onGoWordSearch,
 }) {
   const lifetimeAccuracy =
     profile.totalQuestionsAnswered > 0
@@ -60,6 +61,11 @@ export default function HomeScreen({
               <button className="smallCta" onClick={() => onStartLesson('All')} type="button">
                 <Sparkles size={18} />
                 JUMP INTO FULL BANK
+              </button>
+
+              <button className="smallCta" onClick={onGoWordSearch} type="button">
+                <Target size={18} />
+                PLAY WORD SEARCH
               </button>
             </div>
 
@@ -135,3 +141,4 @@ export default function HomeScreen({
     </>
   );
 }
+

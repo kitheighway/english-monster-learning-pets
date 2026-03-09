@@ -3,6 +3,7 @@ import BuddyCareScreen from './screens/BuddyCareScreen.jsx';
 import HomeScreen from './screens/HomeScreen.jsx';
 import LessonScreen from './screens/LessonScreen.jsx';
 import ResultsScreen from './screens/ResultsScreen.jsx';
+import WordSearchGame from './components/WordSearchGame.jsx';
 
 export default function App() {
   const {
@@ -37,6 +38,7 @@ export default function App() {
         onStartLesson={actions.startLesson}
         onSetLessonMode={actions.setLessonMode}
         onGoBuddyCare={actions.goBuddyCare}
+        onGoWordSearch={actions.goWordSearch}
       />
     );
   }
@@ -50,6 +52,15 @@ export default function App() {
         onGoHome={actions.goHome}
         onFeedBuddy={actions.feedBuddy}
         onStartLesson={actions.startLesson}
+      />
+    );
+  }
+
+  if (screen === SCREENS.WORDSEARCH) {
+    return (
+      <WordSearchGame
+        onBack={actions.goHome}
+        onComplete={actions.completeWordSearch}
       />
     );
   }
