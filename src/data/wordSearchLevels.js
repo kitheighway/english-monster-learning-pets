@@ -5,7 +5,7 @@ export const wordSearchLevels = [
     subtitle: "Find the hidden animal words",
     instruction: "Drag across the letters to find each word.",
     rewardXp: 20,
-    size: 9,
+    size: 7,
     words: ["CAT", "DOG", "FROG", "BIRD", "FISH"],
   },
   {
@@ -14,8 +14,8 @@ export const wordSearchLevels = [
     subtitle: "Find the tasty words",
     instruction: "Look carefully. Words can go across, down, or diagonal.",
     rewardXp: 25,
-    size: 10,
-    words: ["APPLE", "PEAR", "RICE", "MILK", "BREAD"],
+    size: 7,
+    words: ["APPLE", "PEAR", "RICE", "MILK"],
   },
   {
     id: "home-1",
@@ -23,7 +23,7 @@ export const wordSearchLevels = [
     subtitle: "Spot the home words",
     instruction: "Drag in a straight line to find each hidden word.",
     rewardXp: 30,
-    size: 10,
-    words: ["CHAIR", "TABLE", "LAMP", "DOOR", "BED"],
+    size: 7,
+    words: ["CHAIR", "LAMP", "DOOR", "BED"],
   },
 ];

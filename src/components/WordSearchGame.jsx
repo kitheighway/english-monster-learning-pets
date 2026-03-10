@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Search, Sparkles, Trophy, RotateCcw, Eraser } from "lucide-react";
 import { wordSearchLevels } from "../data/wordSearchLevels";
 import {
   buildFoundMap,
@@ -23,20 +24,17 @@ export default function WordSearchGame({
   const [startCell, setStartCell] = useState(null);
   const [hoverCell, setHoverCell] = useState(null);
   const [foundWords, setFoundWords] = useState([]);
-  const [feedback, setFeedback] = useState("Let’s find the hidden words!");
+  const [feedback, setFeedback] = useState("Drag across the letters to find a word!");
   const [celebrating, setCelebrating] = useState(false);
 
   const level = wordSearchLevels[levelIndex];
 
-  const puzzle = useMemo(() => {
-    return generateWordSearch(level);
-  }, [level, refreshSeed]);
+  const puzzle = useMemo(() => generateWordSearch(level), [level, refreshSeed]);
+  const foundLookup = useMemo(() => buildFoundMap(puzzle.placements), [puzzle.placements]);
 
-  const foundLookup = useMemo(() => buildFoundMap(puzzle.placements), [puzzle]);
-  const selectionCells = useMemo(
-    () => getCellsInLine(startCell, hoverCell),
-    [startCell, hoverCell]
-  );
+  const selectionCells = useMemo(() => {
+    return getCellsInLine(startCell, hoverCell);
+  }, [startCell, hoverCell]);
 
   const foundCellIds = useMemo(() => {
     const ids = new Set();
@@ -73,7 +71,7 @@ export default function WordSearchGame({
     setStartCell(null);
     setHoverCell(null);
     setFoundWords([]);
-    setFeedback(level.instruction || "Find all the hidden words.");
+    setFeedback(level.instruction || "Find all the hidden words!");
     setCelebrating(false);
   }, [levelIndex, refreshSeed, level.instruction]);
 
@@ -108,7 +106,7 @@ export default function WordSearchGame({
     const reversedWord = selectedWord.split("").reverse().join("");
 
     if (!matchedWord) {
-      setFeedback("Nice try! That one isn’t a hidden word.");
+      setFeedback("Oops! That line is not one of the hidden words.");
       clearSelection();
       return;
     }
@@ -123,16 +121,16 @@ export default function WordSearchGame({
     setFoundWords(nextWords);
 
     if (selectedWord === matchedWord || reversedWord === matchedWord) {
-      setFeedback(`Brilliant! You found ${matchedWord}!`);
+      setFeedback(`YES! You found ${matchedWord}!`);
     } else {
-      setFeedback(`Great spotting! You found ${matchedWord}!`);
+      setFeedback(`Great job! ${matchedWord} is complete!`);
     }
 
     clearSelection();
 
     if (nextWords.length === puzzle.words.length) {
       setCelebrating(true);
-      setFeedback("Amazing! You found every word!");
+      setFeedback("AMAZING! You found every hidden word!");
       onComplete?.({
         game: "wordsearch",
         levelId: level.id,
@@ -155,143 +153,180 @@ export default function WordSearchGame({
   }
 
   return (
-    <section className="ws-game">
-      <div className="ws-shell">
-        <header className="ws-hero">
-          <div className="ws-hero__left">
-            <div className="ws-badges">
-              <span className="ws-pill ws-pill--lime">Word Search</span>
-              <span className="ws-pill ws-pill--gold">+{level.rewardXp} XP</span>
-            </div>
+    <>
+      <div className="sparkles" />
 
-            <h1 className="ws-title">{level.title}</h1>
-            <p className="ws-subtitle">{level.subtitle}</p>
-
-            <div className="ws-progressBlock">
-              <div className="ws-progressMeta">
-                <span>Progress</span>
-                <strong>
-                  {foundWords.length}/{puzzle.words.length}
-                </strong>
-              </div>
-              <div className="ws-progressBar" aria-hidden="true">
-                <div
-                  className="ws-progressBar__fill"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+      <section className="wrap wsPage">
+        <div className="homeHeader">
+          <div className="brandRow">
+            <div className="badgeMark" aria-hidden="true" />
+            <div>
+              <h1 className="brandTitle">Word Search Quest</h1>
+              <p className="brandSub">
+                Find the hidden words. Big fun round the page. Clean modern puzzle in the middle.
+              </p>
             </div>
           </div>
 
-          <div className="ws-hero__right">
-            <button type="button" className="ws-btn ws-btn--ghost" onClick={onBack}>
-              Back
+          <div className="homeActions">
+            <button type="button" className="btnGhost" onClick={onBack}>
+              <ArrowLeft size={18} />
+              Back home
             </button>
           </div>
-        </header>
+        </div>
 
-        <div className="ws-layout">
-          <div className="ws-boardCard">
-            <div className="ws-helper">
-              <span className="ws-helper__emoji">🔎</span>
-              <p>{feedback}</p>
+        <div className="wsTopRow">
+          <div className="pillMini">
+            <Search size={16} />
+            Word Search
+          </div>
+
+          <div className="pillMini">
+            <Sparkles size={16} />
+            +{level.rewardXp} XP
+          </div>
+
+          <div className="pillMini">
+            <Trophy size={16} />
+            {foundWords.length}/{puzzle.words.length} found
+          </div>
+        </div>
+
+        <div className="wsLayout">
+          <div className="panelCard wsBoardPanel">
+            <div className="panelTitle">
+              <Search size={18} />
+              {level.title}
             </div>
 
-            <div
-              className="ws-grid"
-              style={{ gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))` }}
-              role="grid"
-              aria-label="Word search grid"
-            >
-              {puzzle.grid.map((row, rowIndex) =>
-                row.map((letter, colIndex) => {
-                  const id = getCellId(rowIndex, colIndex);
-                  const isSelected = selectionIds.has(id);
-                  const isFound = foundCellIds.has(id);
+            <div className="note wsSubtitle">{level.subtitle}</div>
 
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      className={[
-                        "ws-cell",
-                        isSelected ? "is-selected" : "",
-                        isFound ? "is-found" : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      onPointerDown={() => beginSelection(rowIndex, colIndex)}
-                      onPointerEnter={() => extendSelection(rowIndex, colIndex)}
-                      aria-label={`Letter ${letter}`}
-                    >
-                      <span>{letter}</span>
-                    </button>
-                  );
-                })
-              )}
+            <div className="xpBox wsProgressBox">
+              <div className="xpTop">
+                <span>Progress</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="track">
+                <div className="fill" style={{ "--pct": `${progress}%` }} />
+              </div>
             </div>
 
-            <div className="ws-actions">
-              <button type="button" className="ws-btn ws-btn--soft" onClick={playAgain}>
+            <div className={`toast ${celebrating ? "good" : ""} wsToast`}>
+              <span>{feedback}</span>
+              <span className="toastRight">{isComplete ? "DONE!" : "KEEP GOING"}</span>
+            </div>
+
+            <div className="wsGridWrap">
+              <div
+                className="wsGrid"
+                style={{ gridTemplateColumns: `repeat(${puzzle.size}, minmax(0, 1fr))` }}
+                role="grid"
+                aria-label="Word search grid"
+              >
+                {puzzle.grid.map((row, rowIndex) =>
+                  row.map((letter, colIndex) => {
+                    const id = getCellId(rowIndex, colIndex);
+                    const isSelected = selectionIds.has(id);
+                    const isFound = foundCellIds.has(id);
+
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        className={[
+                          "wsCell",
+                          isSelected ? "is-selected" : "",
+                          isFound ? "is-found" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        onPointerDown={() => beginSelection(rowIndex, colIndex)}
+                        onPointerEnter={() => extendSelection(rowIndex, colIndex)}
+                        aria-label={`Letter ${letter}`}
+                      >
+                        {letter}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            <div className="ctaStack wsActionStack">
+              <button type="button" className="smallCta" onClick={playAgain}>
+                <RotateCcw size={18} />
                 New puzzle
               </button>
-              <button type="button" className="ws-btn ws-btn--soft" onClick={clearSelection}>
-                Clear
+
+              <button type="button" className="smallCta" onClick={clearSelection}>
+                <Eraser size={18} />
+                Clear line
               </button>
             </div>
           </div>
 
-          <aside className="ws-side">
-            <div className="ws-card">
-              <h2 className="ws-card__title">Find these words</h2>
-              <ul className="ws-wordList">
+          <div className="wsSideCol">
+            <div className="panelCard wsWordsPanel">
+              <div className="panelTitle">
+                <Sparkles size={18} />
+                Find these words
+              </div>
+
+              <div className="wsWordList">
                 {puzzle.words.map((word) => {
                   const done = foundWords.includes(word);
 
                   return (
-                    <li key={word} className={done ? "is-done" : ""}>
+                    <div key={word} className={`wsWordChip ${done ? "done" : ""}`}>
                       <span>{word}</span>
-                      <span className="ws-wordList__icon">{done ? "✓" : "•"}</span>
-                    </li>
+                      <span>{done ? "✓" : "•"}</span>
+                    </div>
                   );
                 })}
-              </ul>
+              </div>
+
+              <div className="note">Words can go across, down, or diagonal.</div>
             </div>
 
-            <div className="ws-card ws-card--tip">
-              <h2 className="ws-card__title">How to play</h2>
-              <p>{level.instruction}</p>
-              <p>Words can go across, down, or diagonal.</p>
+            <div className="panelCard wsHowPanel">
+              <div className="panelTitle">
+                <Search size={18} />
+                How to play
+              </div>
+
+              <div className="wsHowList">
+                <div className="wsHowItem">1. Press a letter to start.</div>
+                <div className="wsHowItem">2. Drag in a straight line.</div>
+                <div className="wsHowItem">3. Let go to check your word.</div>
+              </div>
             </div>
 
             {celebrating && (
-              <div className="ws-card ws-card--success">
-                <div className="ws-successBurst">🎉</div>
-                <h2 className="ws-card__title">You did it!</h2>
-                <p>You found every hidden word in this puzzle.</p>
+              <div className="panelCard wsWinPanel">
+                <div className="panelTitle">
+                  <Trophy size={18} />
+                  You did it!
+                </div>
 
-                <div className="ws-successActions">
-                  <button
-                    type="button"
-                    className="ws-btn ws-btn--primary"
-                    onClick={goNextLevel}
-                  >
-                    {levelIndex < wordSearchLevels.length - 1 ? "Next puzzle" : "Play again"}
+                <div className="note">You found every hidden word in this puzzle.</div>
+
+                <div className="ctaStack">
+                  <button type="button" className="bigCta" onClick={goNextLevel}>
+                    <Sparkles size={18} />
+                    {levelIndex < wordSearchLevels.length - 1 ? "NEXT PUZZLE" : "PLAY AGAIN"}
                   </button>
 
-                  <button
-                    type="button"
-                    className="ws-btn ws-btn--ghost"
-                    onClick={onBack}
-                  >
-                    Continue
+                  <button type="button" className="smallCta" onClick={onBack}>
+                    <ArrowLeft size={18} />
+                    BACK HOME
                   </button>
                 </div>
               </div>
             )}
-          </aside>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
